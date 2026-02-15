@@ -1,18 +1,24 @@
 providers = ["php"]
 
 [phases.setup]
-nixPkgs = ["php82", "php82Packages.composer"]
+nixPkgs = ["php82", "php82Packages.composer", "nodejs_20"]
 
 [phases.install]
-cmds = ["composer install --no-dev --optimize-autoloader"]
+cmds = [
+    "composer install --no-dev --optimize-autoloader --no-interaction",
+    "npm ci",
+    "npm run build"
+]
 
 [phases.build]
 cmds = [
-  "php artisan migrate --force || true",
-  "php artisan config:cache",
-  "php artisan route:cache",
-  "php artisan view:cache"
+    "php artisan migrate --force || true",
+    "php artisan config:cache",
+    "php artisan route:cache",
+    "php artisan view:cache",
+    "php artisan storage:link || true",
+    "chmod -R 775 storage bootstrap/cache"
 ]
 
 [start]
-cmd = "php -S 0.0.0.0:${PORT:-8000} -t public"
+cmd = "php artisan serve --host=0.0.0.0 --port=${PORT:-8080}"
