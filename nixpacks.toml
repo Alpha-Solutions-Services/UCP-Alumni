@@ -1,0 +1,19 @@
+[providers]
+# Detect PHP projects
+[providers.php]
+# Use PHP 8.2
+nixpkgs = ["php82", "php82Packages.composer"]
+
+[build]
+# Install PHP dependencies
+cmds = [
+  "composer install --no-dev --optimize-autoloader",
+  "php artisan migrate --force || true",
+  "php artisan config:cache",
+  "php artisan route:cache",
+  "php artisan view:cache"
+]
+
+[start]
+# Start the Laravel built-in server on the Railway-assigned port
+cmd = "php -S 0.0.0.0:${PORT:-8000} -t public"
